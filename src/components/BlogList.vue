@@ -48,12 +48,17 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 
-const blogs = ref([
+function getRandomImage() {
+  const id = Math.floor(Math.random() * 1000)
+  return `https://picsum.photos/seed/${id}/800/400`
+}
+
+// 示例博客模板
+const defaultBlogsTemplate = [
   {
     id: 1,
     title: '开始Vue之旅',
     summary: 'Vue3的新特性和基础知识介绍，包括组合式API、响应式系统、生命周期钩子等核心概念的详细讲解...',
-    coverImage: 'https://picsum.photos/800/400',
     date: '2024-03-20',
     author: '张三',
     tags: ['Vue', '前端', '教程']
@@ -62,17 +67,45 @@ const blogs = ref([
     id: 2,
     title: 'Tailwind CSS使用技巧',
     summary: '如何高效使用Tailwind CSS构建现代化界面，包括常用类名、响应式设计、自定义配置等实用技巧...',
-    coverImage: 'https://picsum.photos/800/400?random=2',
     date: '2024-03-19',
     author: '李四',
     tags: ['CSS', 'Tailwind', '设计']
-  },
-])
+  }
+]
+
+const blogs = ref([])
 
 onMounted(() => {
-  // 从localStorage读取博客数据
+  // 从localStorage获取示例博客的封面图片
+  let defaultBlogCovers = JSON.parse(localStorage.getItem('defaultBlogCovers') || '{}')
+  
+  // 如果没有存储的封面图片，生成新的并保存
+  if (!defaultBlogCovers[1] || !defaultBlogCovers[2]) {
+    defaultBlogCovers = {
+      ...defaultBlogCovers,  // 保留已有的封面
+      1: defaultBlogCovers[1] || getRandomImage(),
+      2: defaultBlogCovers[2] || getRandomImage()
+    }
+    localStorage.setItem('defaultBlogCovers', JSON.stringify(defaultBlogCovers))
+  }
+
+  // 将封面图片添加到示例博客中
+  const defaultBlogs = defaultBlogsTemplate.map(blog => ({
+    ...blog,
+    coverImage: defaultBlogCovers[blog.id]
+  }))
+
+  // 从localStorage获取用户发布的博客
   const savedBlogs = JSON.parse(localStorage.getItem('blogs') || '[]')
-  // 将新发布的博客与默认博客合并
-  blogs.value = [...savedBlogs, ...blogs.value]
+  
+  // 确保用户博客使用保存的封面图片
+  savedBlogs.forEach(blog => {
+    if (!blog.coverImage && defaultBlogCovers[blog.id]) {
+      blog.coverImage = defaultBlogCovers[blog.id]
+    }
+  })
+
+  // 合并用户博客和示例博客，用户博客在前
+  blogs.value = [...savedBlogs, ...defaultBlogs]
 })
 </script> 

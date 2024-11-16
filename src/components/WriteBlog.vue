@@ -121,29 +121,39 @@ const handleImageUpload = (event) => {
   }
 }
 
+function getRandomImage() {
+  const id = Math.floor(Math.random() * 1000)
+  return `https://picsum.photos/seed/${id}/800/400`
+}
+
 const publishBlog = () => {
-  // 创建新博客对象
+  const blogId = Date.now()
+  let coverImage = blog.value.coverImage
+
+  // 如果没有上传封面，生成一个随机封面并保存
+  if (!coverImage) {
+    // 获取已存储的封面图片
+    let blogCovers = JSON.parse(localStorage.getItem('defaultBlogCovers') || '{}')
+    // 为新博客生成并保存封面
+    coverImage = getRandomImage()
+    blogCovers[blogId] = coverImage
+    localStorage.setItem('defaultBlogCovers', JSON.stringify(blogCovers))
+  }
+
   const newBlog = {
-    id: Date.now(), // 使用时间戳作为临时ID
+    id: blogId,
     title: blog.value.title,
     content: blog.value.content,
-    summary: blog.value.content.slice(0, 200) + '...', // 取前200个字符作为摘要
-    coverImage: blog.value.coverImage || 'https://picsum.photos/800/400', // 如果没有上传图片则使用默认图片
+    summary: blog.value.content.slice(0, 200) + '...',
+    coverImage: coverImage,  // 使用保存的封面图片
     date: new Date().toISOString().split('T')[0],
-    author: '当前用户', // 这里可以替换为实际的用户名
+    author: '当前用户',
     tags: blog.value.tags
   }
 
-  // 获取现有的博客列表
   const existingBlogs = JSON.parse(localStorage.getItem('blogs') || '[]')
-  
-  // 添加新博客
   existingBlogs.unshift(newBlog)
-  
-  // 保存到localStorage
   localStorage.setItem('blogs', JSON.stringify(existingBlogs))
-
-  // 跳转到首页
   router.push('/')
 }
 

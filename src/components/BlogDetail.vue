@@ -1,7 +1,7 @@
 <template>
   <div class="max-w-4xl mx-auto px-4 py-8">
-    <article>
-      <div class="flex justify-between items-start mb-6">
+    <article class="prose lg:prose-lg mx-auto">
+      <div class="flex justify-between items-start mb-6 not-prose">
         <h1 class="text-4xl font-bold text-gray-900">{{ blog.title }}</h1>
         <div class="flex gap-2">
           <button @click="editBlog" 
@@ -14,7 +14,7 @@
           </button>
         </div>
       </div>
-      <div class="text-gray-600 mb-8">
+      <div class="text-gray-600 mb-8 not-prose">
         <span>{{ blog.date }}</span>
         <span class="mx-2">·</span>
         <span>{{ blog.author }}</span>
@@ -25,13 +25,14 @@
           </span>
         </div>
       </div>
-      <img :src="blog.coverImage" :alt="blog.title" 
-        class="w-full aspect-[21/9] object-cover rounded-lg mb-8"/>
-      <div class="prose lg:prose-lg mx-auto" v-html="renderedContent">
+      <div class="not-prose mb-8">
+        <img :src="blog.coverImage" :alt="blog.title" 
+          class="w-full aspect-[21/9] object-cover rounded-lg"/>
+      </div>
+      <div v-html="renderedContent">
       </div>
     </article>
 
-    <!-- 删除确认对话框 -->
     <div v-if="showDeleteModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
       <div class="bg-white rounded-lg p-6 max-w-sm mx-4">
         <h3 class="text-lg font-semibold mb-4">确认删除</h3>
@@ -67,21 +68,20 @@ const renderedContent = computed(() => {
 })
 
 onMounted(() => {
-  // 从localStorage获取所有博客
   const allBlogs = JSON.parse(localStorage.getItem('blogs') || '[]')
-  // 查找当前博客ID对应的博客
   const currentBlog = allBlogs.find(b => b.id.toString() === route.params.id)
   
   if (currentBlog) {
     blog.value = currentBlog
   } else {
-    // 如果在localStorage中找不到，则查找默认博客
+    const defaultBlogCovers = JSON.parse(localStorage.getItem('defaultBlogCovers') || '{}')
+    
     const defaultBlogs = [
       {
         id: 1,
         title: '开始Vue之旅',
-        content: 'Vue3的新特性和基础知识介绍...',
-        coverImage: 'https://picsum.photos/800/400',
+        content: '# Vue3的新特性\n\nVue3带来了许多激动人心的新特性...',
+        coverImage: defaultBlogCovers[1],
         date: '2024-03-20',
         author: '张三',
         tags: ['Vue', '前端', '教程']
@@ -89,8 +89,8 @@ onMounted(() => {
       {
         id: 2,
         title: 'Tailwind CSS使用技巧',
-        content: '如何高效使用Tailwind CSS构建现代化界面...',
-        coverImage: 'https://picsum.photos/800/400?random=2',
+        content: '# Tailwind CSS 入门指南\n\n本文将介绍如何高效使用Tailwind CSS...',
+        coverImage: defaultBlogCovers[2],
         date: '2024-03-19',
         author: '李四',
         tags: ['CSS', 'Tailwind', '设计']
@@ -107,7 +107,6 @@ onMounted(() => {
 })
 
 const editBlog = () => {
-  // 将当前博客数据存储到 localStorage，供编辑页面使用
   localStorage.setItem('editingBlog', JSON.stringify(blog.value))
   router.push(`/edit/${blog.value.id}`)
 }
@@ -117,22 +116,17 @@ const confirmDelete = () => {
 }
 
 const deleteBlog = () => {
-  // 从 localStorage 获取所有博客
   const allBlogs = JSON.parse(localStorage.getItem('blogs') || '[]')
-  // 过滤掉当前博客
   const updatedBlogs = allBlogs.filter(b => b.id.toString() !== route.params.id)
-  // 更新 localStorage
   localStorage.setItem('blogs', JSON.stringify(updatedBlogs))
-  // 关闭对话框
   showDeleteModal.value = false
-  // 跳转到首页
   router.push('/')
 }
 </script>
 
 <style>
 .prose {
-  @apply max-w-4xl;
+  @apply max-w-3xl !important;
 }
 .prose h1 {
   @apply text-3xl font-bold mb-6 text-gray-900;
@@ -163,5 +157,9 @@ const deleteBlog = () => {
 }
 .prose pre {
   @apply bg-gray-100 rounded-lg p-4 mb-6 overflow-x-auto;
+}
+
+.not-prose {
+  @apply max-w-3xl mx-auto w-full;
 }
 </style> 

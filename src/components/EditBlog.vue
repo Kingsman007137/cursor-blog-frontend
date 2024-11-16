@@ -134,7 +134,20 @@ const updateBlog = () => {
   const allBlogs = JSON.parse(localStorage.getItem('blogs') || '[]')
   // 找到并更新当前博客
   const index = allBlogs.findIndex(b => b.id.toString() === route.params.id)
+  
   if (index !== -1) {
+    // 如果更换了封面图片
+    if (blog.value.coverImage !== allBlogs[index].coverImage) {
+      // 如果是新上传的图片，直接使用
+      // 如果没有上传新图片，生成新的随机封面
+      if (!blog.value.coverImage) {
+        let blogCovers = JSON.parse(localStorage.getItem('defaultBlogCovers') || '{}')
+        blogCovers[blog.value.id] = getRandomImage()
+        localStorage.setItem('defaultBlogCovers', JSON.stringify(blogCovers))
+        blog.value.coverImage = blogCovers[blog.value.id]
+      }
+    }
+
     allBlogs[index] = {
       ...blog.value,
       summary: blog.value.content.slice(0, 200) + '...',
@@ -147,6 +160,11 @@ const updateBlog = () => {
   localStorage.removeItem('editingBlog')
   // 返回博客详情页
   router.push(`/blog/${route.params.id}`)
+}
+
+function getRandomImage() {
+  const id = Math.floor(Math.random() * 1000)
+  return `https://picsum.photos/seed/${id}/800/400`
 }
 
 const cancelEdit = () => {
