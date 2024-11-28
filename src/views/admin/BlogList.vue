@@ -2,12 +2,20 @@
   <div>
     <div class="flex justify-between items-center mb-6">
       <h2 class="text-2xl font-bold text-gray-900">博客管理</h2>
-      <router-link 
-        to="/adm/blogs/create"
-        class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
-      >
-        新建博客
-      </router-link>
+      <div class="flex gap-4">
+        <router-link 
+          to="/adm/blogs/create"
+          class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
+        >
+          写博客 
+        </router-link>
+        <button 
+          @click="handleLogout"
+          class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700"
+        >
+          退出登录
+        </button>
+      </div>
     </div>
 
     <!-- 博客列表 -->
@@ -80,6 +88,11 @@ const blogs = ref([])
 const showDeleteModal = ref(false)
 const blogToDelete = ref(null)
 const errorMsg = ref('')
+
+const handleLogout = () => {
+  localStorage.removeItem('token')
+  router.push('/adm/login')
+}
 
 // 获取博客列表
 const fetchBlogs = async () => {
