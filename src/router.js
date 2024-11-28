@@ -46,32 +46,7 @@ const routes = [
         path: 'blogs/edit/:id',
         component: AdminBlogEdit
       }
-    ],
-    beforeEnter: async (to, from, next) => {
-      const token = localStorage.getItem('token')
-      if (!token) {
-        next('/adm/login')
-        return
-      }
-      try {
-        const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/adm/authCheck`, {
-          method: 'GET',
-          headers: {
-            'Accept': 'application/json',
-            'token': localStorage.getItem('token')
-          }
-        })
-        if (!response.ok) {
-          localStorage.removeItem('token')
-          next('/adm/login')
-          return
-        }
-        next()
-      } catch (error) {
-        localStorage.removeItem('token')
-        next('/adm/login')
-      }
-    }
+    ]
   }
 ]
 
