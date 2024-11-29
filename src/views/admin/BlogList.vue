@@ -18,10 +18,12 @@
       </div>
     </div>
 
-    <!-- 博客列表 -->
-    <div v-if="errorMsg" class="mb-4 text-red-500 text-center">
-      {{ errorMsg }}
+    <!-- 错误提示 -->
+    <div v-if="errorMsg" class="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+      <p class="text-red-600">{{ errorMsg }}</p>
     </div>
+
+    <!-- 博客列表 -->
     <div class="bg-white shadow overflow-hidden sm:rounded-md">
       <ul class="divide-y divide-gray-200">
         <li v-for="blog in blogs" :key="blog.id" class="hover:bg-gray-50">
@@ -97,15 +99,23 @@ const handleLogout = () => {
 // 获取博客列表
 const fetchBlogs = async () => {
   try {
+    // 先检查是否有token
+    const token = localStorage.getItem('token')
+    if (!token) {
+      router.replace('/adm/login')
+      return
+    }
+
     const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/adm/blogs`, {
+      method: 'GET',
       headers: {
         'Accept': 'application/json',
-        'token': localStorage.getItem('token')
+        'token': token
       }
     })
-    if (response.status === 401) {
-      localStorage.removeItem('token')
-      router.replace('/adm/login')
+    if (response.status === 404) {
+      errorMsg.value = '没有找到博客列表'
+      blogs.value = []
       return
     }
     const data = await response.json()
@@ -117,7 +127,7 @@ const fetchBlogs = async () => {
         router.replace('/adm/login')
         return
       }
-      errorMsg.value = data.msg || '获取博客列表失败'
+      errorMsg.value = data.msg
     }
   } catch (error) {
     console.error('获取博客列表失败:', error)
@@ -135,14 +145,26 @@ const confirmDelete = (blog) => {
 const handleDelete = async () => {
   if (!blogToDelete.value) return
   
+  // 先检查是否有token
+  const token = localStorage.getItem('token')
+  if (!token) {
+    router.replace('/adm/login')
+    return
+  }
+  
   try {
     const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/adm/blogs/${blogToDelete.value.id}`, {
       method: 'DELETE',
       headers: {
         'Accept': 'application/json',
-        'token': localStorage.getItem('token')
+        'token': token
       }
     })
+    if (response.status === 401) {
+      localStorage.removeItem('token')
+      router.replace('/adm/login')
+      return
+    }
     const data = await response.json()
     if (data.code === 1) {
       await fetchBlogs() // 重新获取列表
@@ -167,6 +189,12 @@ const formatDate = (dateString) => {
 }
 
 onMounted(() => {
-  fetchBlogs()
+  // 确保组件挂载时也检查token
+  const token = localStorage.getItem('token')
+  if (token) {
+    fetchBlogs()
+  } else {
+    router.replace('/adm/login')
+  }
 })
 </script>

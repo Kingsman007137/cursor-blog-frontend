@@ -275,6 +275,12 @@ const handleSubmit = async () => {
       body: JSON.stringify(blog.value)
     })
     
+    if (response.status === 401) {
+      localStorage.removeItem('token')
+      router.replace('/adm/login')
+      return
+    }
+    
     const data = await response.json()
     if (data.code === 1) {
       router.push('/adm/blogs')
