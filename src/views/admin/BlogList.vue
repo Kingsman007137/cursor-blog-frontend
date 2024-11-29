@@ -33,8 +33,11 @@
                 <p class="text-lg font-medium text-gray-900 truncate">
                   {{ blog.title }}
                 </p>
+                <p class="mt-2 text-gray-600 line-clamp-2 text-sm">
+                  {{ getContentPreview(blog.content) }}
+                </p>
                 <p class="mt-1 text-sm text-gray-500">
-                  创建时间：{{ formatDate(blog.created_at) }}
+                  更新时间：{{ formatDate(blog.updatedAt) }}
                 </p>
               </div>
               <div class="flex gap-2">
@@ -181,11 +184,36 @@ const handleDelete = async () => {
 
 // 格式化日期
 const formatDate = (dateString) => {
-  return new Date(dateString).toLocaleDateString('zh-CN', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric'
-  })
+  if (!dateString) return '暂无更新时间'
+  try {
+    const date = new Date(dateString)
+    return date.toLocaleString('zh-CN', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit'
+    })
+  } catch (error) {
+    return '日期格式错误'
+  }
+}
+
+// 获取内容预览
+const getContentPreview = (content) => {
+  if (!content) return '暂无内容'
+  // 移除Markdown语法标记
+  const plainText = content
+    .replace(/#{1,6} /g, '')     // 移除标题
+    .replace(/\*\*/g, '')        // 移除加粗
+    .replace(/\*/g, '')          // 移除斜体
+    .replace(/`{3}[\s\S]*?`{3}/g, '') // 移除代码块
+    .replace(/`.*?`/g, '')      // 移除行内代码
+    .replace(/\[.*?\]\(.*?\)/g, '') // 移除链接
+    .replace(/!\[.*?\]\(.*?\)/g, '') // 移除图片
+    .replace(/>/g, '')          // 移除引用
+    .trim()
+  return plainText.length > 100 ? plainText.slice(0, 100) + '...' : plainText
 }
 
 onMounted(() => {

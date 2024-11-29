@@ -1,6 +1,6 @@
 <template>
   <div class="container mx-auto px-4 py-8">
-    <h1 class="text-3xl font-bold text-gray-800 mb-8">博客列表</h1>
+    <h1 class="text-3xl font-bold text-gray-800 mb-8">我的文章</h1>
     
     <!-- 加载状态 -->
     <div v-if="isLoading" class="flex justify-center items-center py-12">
@@ -26,12 +26,10 @@
       <article v-for="blog in blogs" :key="blog.id" 
         class="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300">
         <div class="p-6">
-          <div class="flex items-center mb-4">
-            <span class="text-sm text-gray-500">{{ formatDate(blog.created_at) }}</span>
-          </div>
           <h2 class="text-2xl font-bold mb-3 text-gray-800">{{ blog.title }}</h2>
-          <p class="text-gray-600 mb-4 line-clamp-3">{{ blog.content }}</p>
-          <div class="flex justify-end">
+          <p class="text-gray-600 mb-4 line-clamp-2">{{ getContentPreview(blog.content) }}</p>
+          <div class="flex justify-between items-center">
+            <span class="text-sm text-gray-500">{{ formatDate(blog.updatedAt) }}</span>
             <router-link :to="`/blogs/${blog.id}`" 
               class="text-blue-600 hover:text-blue-800 font-medium">
               阅读更多 →
@@ -75,11 +73,36 @@ const fetchBlogs = async () => {
 }
 
 const formatDate = (dateString) => {
-  return new Date(dateString).toLocaleDateString('zh-CN', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric'
-  })
+  if (!dateString) return '暂无更新时间'
+  try {
+    const date = new Date(dateString)
+    return date.toLocaleString('zh-CN', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit'
+    })
+  } catch (error) {
+    return '日期格式错误'
+  }
+}
+
+// 获取内容预览
+const getContentPreview = (content) => {
+  if (!content) return '暂无内容'
+  // 移除Markdown语法标记
+  const plainText = content
+    .replace(/#{1,6} /g, '')     // 移除标题
+    .replace(/\*\*/g, '')        // 移除加粗
+    .replace(/\*/g, '')          // 移除斜体
+    .replace(/`{3}[\s\S]*?`{3}/g, '') // 移除代码块
+    .replace(/`.*?`/g, '')      // 移除行内代码
+    .replace(/\[.*?\]\(.*?\)/g, '') // 移除链接
+    .replace(/!\[.*?\]\(.*?\)/g, '') // 移除图片
+    .replace(/>/g, '')          // 移除引用
+    .trim()
+  return plainText.length > 100 ? plainText.slice(0, 100) + '...' : plainText
 }
 
 onMounted(() => {
