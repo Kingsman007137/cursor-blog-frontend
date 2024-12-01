@@ -46,6 +46,7 @@ npm config set registry https://registry.npmmirror.com
 
 - [ ] 完善写博客和博客编辑功能（如保存草稿，图片操作）
 - [ ] 文章按月份分类功能
+- [ ] 首页下拉分页查询
 - [ ] 文章搜索功能
 - [ ] 完善图片的上传和显示
 - [ ] 等等......
