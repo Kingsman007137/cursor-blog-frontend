@@ -60,7 +60,7 @@ const fetchBlogs = async () => {
     })
     const data = await response.json()
     if (data.code === 1) {
-      blogs.value = data.data
+      blogs.value = data.data.sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt))
     } else {
       errorMsg.value = data.msg || '获取博客列表失败'
     }

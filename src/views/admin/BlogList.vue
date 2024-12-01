@@ -123,7 +123,8 @@ const fetchBlogs = async () => {
     }
     const data = await response.json()
     if (data.code === 1) {
-      blogs.value = data.data
+      // 按更新时间倒序排列
+      blogs.value = data.data.sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt))
     } else {
       if (data.msg === 'NOT_LOGIN') {
         localStorage.removeItem('token')
