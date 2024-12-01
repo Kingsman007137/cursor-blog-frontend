@@ -1,6 +1,6 @@
 <template>
   <div class="container mx-auto px-4 py-8">
-    <article class="max-w-3xl mx-auto bg-white rounded-lg shadow-lg overflow-hidden">
+    <article class="max-w-5xl mx-auto bg-white rounded-lg overflow-hidden w-4/5">
       <div class="p-8">
         <h1 class="text-4xl font-bold text-gray-900 mb-4">{{ blog.title }}</h1>
         <div class="text-gray-500 mb-8">
@@ -9,13 +9,6 @@
         <div class="prose max-w-none" v-html="renderedContent"></div>
       </div>
     </article>
-    
-    <div class="max-w-3xl mx-auto mt-8">
-      <router-link to="/blogs" 
-        class="text-blue-600 hover:text-blue-800 font-medium">
-        ← 返回列表
-      </router-link>
-    </div>
   </div>
 </template>
 
@@ -94,6 +87,9 @@ onMounted(() => {
 </script>
 
 <style>
+.container {
+  @apply max-w-full;
+}
 .prose {
   @apply max-w-none;
 }
@@ -105,5 +101,14 @@ onMounted(() => {
 }
 .prose p {
   @apply mb-4;
+}
+.prose pre {
+  @apply bg-transparent;
+}
+.prose code {
+  @apply bg-transparent;
+}
+article {
+  @apply bg-white;
 }
 </style> 
