@@ -6,9 +6,7 @@
         <div class="text-gray-500 mb-8">
           {{ formatDate(blog.updatedAt) }}
         </div>
-        <div class="prose max-w-none">
-          {{ blog.content }}
-        </div>
+        <div class="prose max-w-none" v-html="renderedContent"></div>
       </div>
     </article>
     
@@ -22,12 +20,32 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import MarkdownIt from 'markdown-it'
+import hljs from 'highlight.js'
+import 'highlight.js/styles/vs2015.css'
 
 const route = useRoute()
 const router = useRouter()
 const blog = ref({})
+
+// 初始化markdown-it及其插件
+const md = new MarkdownIt({
+  html: true,
+  breaks: true,
+  linkify: true,
+  highlight: function (str, lang) {
+    if (lang && hljs.getLanguage(lang)) {
+      try {
+        return '<pre class="hljs"><code>' +
+               hljs.highlight(str, { language: lang, ignoreIllegals: true }).value +
+               '</code></pre>';
+      } catch (__) {}
+    }
+    return '<pre class="hljs"><code>' + md.utils.escapeHtml(str) + '</code></pre>';
+  }
+})
 
 const fetchBlog = async (id) => {
   try {
@@ -64,6 +82,11 @@ const formatDate = (dateString) => {
     return '日期格式错误'
   }
 }
+
+// 计算属性用于渲染Markdown内容
+const renderedContent = computed(() => {
+  return md.render(blog.value.content || '')
+})
 
 onMounted(() => {
   fetchBlog(route.params.id)
