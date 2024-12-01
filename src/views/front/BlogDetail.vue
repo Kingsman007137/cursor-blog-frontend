@@ -4,7 +4,7 @@
       <div class="p-8">
         <h1 class="text-4xl font-bold text-gray-900 mb-4">{{ blog.title }}</h1>
         <div class="text-gray-500 mb-8">
-          {{ formatDate(blog.created_at) }}
+          {{ formatDate(blog.updatedAt) }}
         </div>
         <div class="prose max-w-none">
           {{ blog.content }}
@@ -50,11 +50,19 @@ const fetchBlog = async (id) => {
 }
 
 const formatDate = (dateString) => {
-  return new Date(dateString).toLocaleDateString('zh-CN', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric'
-  })
+  if (!dateString) return '暂无更新时间'
+  try {
+    const date = new Date(dateString)
+    return date.toLocaleString('zh-CN', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit'
+    })
+  } catch (error) {
+    return '日期格式错误'
+  }
 }
 
 onMounted(() => {
