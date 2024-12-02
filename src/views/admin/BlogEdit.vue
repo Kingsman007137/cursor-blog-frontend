@@ -149,6 +149,8 @@ const md = new MarkdownIt({
   html: true,
   breaks: true,
   linkify: true,
+  xhtmlOut: true,
+  typographer: true,
   highlight: function (str, lang) {
     if (lang && hljs.getLanguage(lang)) {
       try {
@@ -169,6 +171,11 @@ const quickInserts = {
   table: {
     label: '表格',
     desc: '插入表格',
+    template: null
+  },
+  image: {
+    label: '图片',
+    desc: '插入图片',
     template: null
   },
   code: {
@@ -196,6 +203,13 @@ const insertMarkdown = async (key) => {
     tableRows.value = 3
     tableCols.value = 3
     tableError.value = ''
+  } else if (key === 'image') {
+    // 触发文件选择
+    const input = document.createElement('input')
+    input.type = 'file'
+    input.accept = 'image/*'
+    input.onchange = handleImageSelect
+    input.click()
   } else {
     insertTemplate(quickInserts[key].template)
   }
@@ -356,6 +370,39 @@ const handleTab = (e) => {
   }, 0)
 }
 
+// 处理图片选择
+const handleImageSelect = async (event) => {
+  const file = event.target.files[0]
+  if (!file) return
+  
+  const formData = new FormData()
+  formData.append('image', file)
+  formData.append('blogId', route.params.id || 'new')
+  
+  try {
+    const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/adm/upload`, {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'token': localStorage.getItem('token')
+      },
+      body: formData
+    })
+    
+    const data = await response.json()
+    if (data.code === 1) {
+      // 插入图片的Markdown语法
+      const imageMarkdown = `\n![${file.name}](${data.data})\n`
+      insertTemplate(imageMarkdown)
+    } else {
+      errorMsg.value = data.msg || '上传图片失败'
+    }
+  } catch (error) {
+    console.error('上传图片失败:', error)
+    errorMsg.value = '上传图片失败，请重试'
+  }
+}
+
 onMounted(() => {
   // 如果是编辑模式，获取博客详情
   if (isEdit.value) {
@@ -365,10 +412,20 @@ onMounted(() => {
 </script>
 
 <style>
-/* Markdown 预览样式 */
 .prose {
   @apply max-w-none;
 }
+
+/* 图片容器样式 */
+.prose p:has(img) {
+  @apply flex justify-center;
+}
+
+/* 图片样式 */
+.prose img {
+  @apply h-auto rounded-lg shadow-lg my-8;
+}
+
 .prose h1 {
   @apply text-2xl font-bold mb-4;
 }

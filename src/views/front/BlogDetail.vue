@@ -28,6 +28,8 @@ const md = new MarkdownIt({
   html: true,
   breaks: true,
   linkify: true,
+  xhtmlOut: true,
+  typographer: true,
   highlight: function (str, lang) {
     if (lang && hljs.getLanguage(lang)) {
       try {
@@ -92,6 +94,12 @@ onMounted(() => {
 }
 .prose {
   @apply max-w-none;
+}
+.prose p:has(img) {
+  @apply flex justify-center;
+}
+.prose img {
+  @apply h-auto rounded-lg shadow-lg my-8;
 }
 .prose h1 {
   @apply text-2xl font-bold mb-4;
