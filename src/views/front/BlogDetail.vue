@@ -4,7 +4,10 @@
       <div class="p-8">
         <h1 class="text-4xl font-bold text-gray-900 mb-4">{{ blog.title }}</h1>
         <div class="text-gray-500 mb-8">
-          {{ formatDate(blog.updatedAt) }}
+          发布于 {{ formatDate(blog.createdAt) }}
+          <span v-if="blog.updatedAt !== blog.createdAt">
+            · 最近修改于 {{ formatDate(blog.updatedAt) }}
+          </span>
         </div>
         <div class="prose max-w-none" v-html="renderedContent"></div>
       </div>

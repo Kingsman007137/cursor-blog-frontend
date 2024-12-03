@@ -29,7 +29,7 @@
           <h2 class="text-2xl font-bold mb-3 text-gray-800">{{ blog.title }}</h2>
           <p class="text-gray-600 mb-4 line-clamp-2">{{ getContentPreview(blog.content) }}</p>
           <div class="flex justify-between items-center">
-            <span class="text-sm text-gray-500">{{ formatDate(blog.updatedAt) }}</span>
+            <span class="text-sm text-gray-500">{{ formatDate(blog.createdAt) }}</span>
             <router-link :to="`/blogs/${blog.id}`" 
               class="text-blue-600 hover:text-blue-800 font-medium">
               阅读更多 →
@@ -60,7 +60,7 @@ const fetchBlogs = async () => {
     })
     const data = await response.json()
     if (data.code === 1) {
-      blogs.value = data.data.sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt))
+      blogs.value = data.data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
     } else {
       errorMsg.value = data.msg || '获取博客列表失败'
     }

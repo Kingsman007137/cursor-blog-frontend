@@ -37,7 +37,7 @@
                   {{ getContentPreview(blog.content) }}
                 </p>
                 <p class="mt-1 text-sm text-gray-500">
-                  更新时间：{{ formatDate(blog.updatedAt) }}
+                  发布时间：{{ formatDate(blog.createdAt) }}
                 </p>
               </div>
               <div class="flex gap-2">
@@ -124,7 +124,7 @@ const fetchBlogs = async () => {
     const data = await response.json()
     if (data.code === 1) {
       // 按更新时间倒序排列
-      blogs.value = data.data.sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt))
+      blogs.value = data.data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
     } else {
       if (data.msg === 'NOT_LOGIN') {
         localStorage.removeItem('token')
