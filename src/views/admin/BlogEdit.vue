@@ -1,6 +1,6 @@
 <template>
-  <div>
-    <div class="flex justify-between items-center mb-6">
+  <div class="w-full px-0">
+    <div class="flex justify-between items-center mb-4 px-2">
       <h2 class="text-2xl font-bold text-gray-900">
         {{ isEdit ? '编辑博客' : '写博客' }}
         <span v-if="draftTime" class="text-sm font-normal text-gray-500 ml-2">
@@ -30,7 +30,7 @@
     </div>
 
     <!-- 标题输入 -->
-    <div class="bg-white shadow-sm rounded-lg p-4 mb-4">
+    <div class="bg-white shadow-sm rounded-lg p-4 mb-2">
       <input
         v-model="blog.title"
         type="text"
@@ -41,7 +41,7 @@
     </div>
 
     <!-- Markdown编辑器 -->
-    <div class="grid grid-cols-2 gap-4 bg-white shadow-lg rounded-lg">
+    <div class="grid grid-cols-2 gap-0 bg-white shadow-lg rounded-lg">
       <!-- 编辑区 -->
       <div class="p-4 border-r">
         <div class="mb-2 flex justify-between items-center">
@@ -60,7 +60,7 @@
         </div>
         <textarea
           v-model="blog.content"
-          class="w-full h-[calc(100vh-300px)] p-4 font-mono text-gray-800 border rounded-lg focus:outline-none focus:border-blue-500"
+          class="w-full h-[calc(100vh-180px)] p-4 font-mono text-gray-800 border rounded-lg focus:outline-none focus:border-blue-500"
           placeholder="使用Markdown语法编写文章..."
           @keydown.tab.prevent="handleTab"
         ></textarea>
@@ -72,7 +72,7 @@
           <span class="text-sm font-medium text-gray-700">预览</span>
         </div>
         <div 
-          class="w-full h-[calc(100vh-300px)] overflow-y-auto prose prose-sm max-w-none p-4 border rounded-lg"
+          class="w-full h-[calc(100vh-180px)] overflow-y-auto prose prose-sm max-w-none p-4 border rounded-lg"
           v-html="renderedContent"
         >
         </div>
