@@ -20,6 +20,8 @@
 import { ref, onMounted, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import MarkdownIt from 'markdown-it'
+import markdownItMark from 'markdown-it-mark'
+import markdownItTaskLists from 'markdown-it-task-lists'
 import hljs from 'highlight.js'
 import 'highlight.js/styles/vs2015.css'
 
@@ -43,6 +45,13 @@ const md = new MarkdownIt({
     return '<pre class="hljs"><code>' + md.utils.escapeHtml(str) + '</code></pre>';
   }
 })
+.use(markdownItMark)
+.use(markdownItTaskLists)
+
+// 自定义行内代码渲染规则
+md.renderer.rules.code_inline = function(tokens, idx) {
+  return '<code>' + tokens[idx].content + '</code>';
+}
 
 // 自定义图片渲染规则
 md.renderer.rules.image = function (tokens, idx, options, env, slf) {
@@ -161,7 +170,49 @@ article {
 
 /* 代码块背景 */
 .prose pre {
-  background: rgba(30, 30, 30, 0.8) !important;
+  background: #1e1e1e !important;
   backdrop-filter: blur(4px);
+}
+
+/* 分割线样式 */
+.prose hr {
+  @apply my-8 border-0 border-b-2 border-gray-500;
+}
+
+/* 表格样式 */
+.prose table {
+  @apply w-full border-collapse mb-4;
+}
+.prose th,
+.prose td {
+  @apply border border-gray-500 p-2;
+}
+.prose th {
+  @apply bg-gray-100;
+}
+
+/* 引用样式 */
+.prose blockquote {
+  @apply border-l-4 border-fuchsia-400 pl-4 my-4 py-2;
+  background: rgba(219, 234, 254, 0.2);
+}
+
+/* 高亮显示样式 */
+.prose mark {
+  @apply px-1;
+  background: rgba(167, 139, 250, 0.8);  /* 深紫色半透明背景 */
+}
+
+/* 列表样式 */
+.prose ul {
+  @apply list-disc pl-5 mb-4;
+}
+
+.prose ul li::marker {
+  color: #1f2937;  /* 深灰色标号 (gray-800) */
+}
+
+.prose ol {
+  @apply list-decimal pl-5 mb-4;
 }
 </style> 

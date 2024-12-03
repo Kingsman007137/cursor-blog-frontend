@@ -1,6 +1,6 @@
 <template>
-  <div class="w-full px-0">
-    <div class="flex justify-between items-center mb-4 px-2">
+  <div>
+    <div class="flex justify-between items-center mb-6">
       <h2 class="text-2xl font-bold text-gray-900">
         {{ isEdit ? '编辑博客' : '写博客' }}
         <span v-if="draftTime" class="text-sm font-normal text-gray-500 ml-2">
@@ -375,7 +375,7 @@ const fetchBlog = async (id) => {
         router.replace('/adm/login')
         return
       }
-      errorMsg.value = data.msg || '获取博客详情失败'
+      errorMsg.value = data.msg || '获取客详情失败'
       router.push('/adm/blogs')
     }
   } catch (error) {
@@ -518,7 +518,7 @@ const handleCancel = () => {
   router.back()
 }
 
-// 实际插入模板的函数
+// 实插入模的函数
 const insertTemplate = (template) => {
   const textarea = document.querySelector('textarea')
   const start = textarea.selectionStart
@@ -570,6 +570,11 @@ const handleLinkConfirm = () => {
   linkUrl.value = ''
   linkError.value = ''
 }
+
+// 自定义行内代码渲染规则
+md.renderer.rules.code_inline = function(tokens, idx) {
+  return '<code>' + tokens[idx].content + '</code>';
+}
 </script>
 
 <style>
@@ -591,12 +596,13 @@ const handleLinkConfirm = () => {
 
 /* 分割线样式 */
 .prose hr {
-  @apply my-8 border-0 border-b-2 border-gray-300;
+  @apply my-8 border-0 border-b-2 border-gray-500;
 }
 
 /* 引用样式 */
 .prose blockquote {
-  @apply border-l-4 border-blue-300 pl-4 my-4 bg-blue-50 py-2;
+  @apply border-l-4 border-fuchsia-400 pl-4 my-4 py-2;
+  background: rgba(219, 234, 254, 0.2);
 }
 
 /* 引用文本样式 */
@@ -631,27 +637,39 @@ const handleLinkConfirm = () => {
 .prose ul {
   @apply list-disc pl-5 mb-4;
 }
+
+.prose ul li {
+  @apply text-gray-800 not-italic;
+}
+
+.prose ul li::marker {
+  color: #1f2937;  /* 深灰色标号 (gray-800) */
+}
+
 .prose ol {
   @apply list-decimal pl-5 mb-4;
 }
+
 .prose table {
   @apply w-full border-collapse mb-4;
 }
 .prose th,
 .prose td {
-  @apply border border-gray-300 p-2;
+  @apply border border-gray-500 p-2;
 }
 .prose th {
-  @apply bg-gray-50;
+  @apply bg-gray-100;
+  background: rgba(255, 255, 255, 0.1);  /* 淡色半透明背景 */
 }
 .prose mark {
-  @apply bg-yellow-200 px-1;
+  @apply px-1;
+  background: rgba(167, 139, 250, 0.8);  /* 深紫色半透明背景 */
 }
 .prose input[type="checkbox"] {
   @apply mr-2;
 }
 .prose pre {
-  @apply bg-[#1E1E1E] rounded-lg p-4 mb-4 overflow-x-auto;
+  @apply bg-black rounded-lg p-4 mb-4 overflow-x-auto;
 }
 .prose pre code {
   @apply bg-transparent p-0 text-white;
@@ -659,8 +677,8 @@ const handleLinkConfirm = () => {
   line-height: 1.5;
 }
 .prose code:not(pre code) {
-  @apply bg-gray-200 rounded px-1 py-0.5 text-sm text-gray-800;
-  font-size: 1em;
+  @apply rounded px-1 py-0.5 text-sm text-gray-800;
+  background: rgba(229, 231, 235, 0.3);  /* 淡灰色半透明背景 */
 }
 .hljs {
   background: #1E1E1E !important;
