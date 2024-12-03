@@ -130,13 +130,24 @@ onMounted(() => {
   @apply text-xl font-bold mb-3;
 }
 .prose p {
-  @apply mb-4;
+  @apply mb-4 text-base;
+  font-size: 1.1em;
+  line-height: 1.2;
 }
 .prose pre {
   @apply bg-transparent;
 }
 .prose code {
   @apply bg-transparent;
+}
+.prose pre code {
+  @apply bg-transparent p-0 text-white;
+  font-size: 1.1em;
+  line-height: 1.5;
+}
+.prose code:not(pre code) {
+  @apply bg-gray-200 rounded px-1 py-0.5 text-sm text-gray-800;
+  font-size: 1em;
 }
 article {
   @apply bg-white;

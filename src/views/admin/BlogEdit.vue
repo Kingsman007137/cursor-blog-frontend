@@ -502,6 +502,13 @@ const insertMarkdown = async (key) => {
   @apply max-w-none;
 }
 
+/* 正文字体大小 */
+.prose p {
+  @apply mb-4 text-base;
+  font-size: 1.1em;
+  line-height: 1.2;
+}
+
 /* 分割线样式 */
 .prose hr {
   @apply my-8 border-0 border-b-2 border-gray-300;
@@ -541,9 +548,6 @@ const insertMarkdown = async (key) => {
 .prose h3 {
   @apply text-lg font-bold mb-2;
 }
-.prose p {
-  @apply mb-4;
-}
 .prose ul {
   @apply list-disc pl-5 mb-4;
 }
@@ -571,11 +575,12 @@ const insertMarkdown = async (key) => {
 }
 .prose pre code {
   @apply bg-transparent p-0 text-white;
-  font-size: 0.9em;
+  font-size: 1.1em;
   line-height: 1.5;
 }
 .prose code:not(pre code) {
   @apply bg-gray-200 rounded px-1 py-0.5 text-sm text-gray-800;
+  font-size: 1em;
 }
 .hljs {
   background: #1E1E1E !important;
