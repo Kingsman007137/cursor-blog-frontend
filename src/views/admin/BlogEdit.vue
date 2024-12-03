@@ -376,11 +376,10 @@ const handleImageSelect = async (event) => {
   if (!file) return
   
   const formData = new FormData()
-  formData.append('image', file)
-  formData.append('blogId', route.params.id || 'new')
+  formData.append('file', file)
   
   try {
-    const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/adm/upload`, {
+    const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/adm/images/upload`, {
       method: 'POST',
       headers: {
         'Accept': 'application/json',
