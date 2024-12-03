@@ -1,6 +1,7 @@
 <template>
-  <div class="container mx-auto px-4 py-8">
-    <article class="max-w-5xl mx-auto bg-white rounded-lg overflow-hidden w-4/5">
+  <div class="container mx-auto">
+    <article class="max-w-5xl mx-auto overflow-hidden w-4/5 backdrop-blur-md border-x border-white/20"
+     style="background: rgba(255, 255, 255, 0.1); min-height: calc(100vh - 64px);">
       <div class="p-8">
         <h1 class="text-4xl font-bold text-gray-900 mb-4">{{ blog.title }}</h1>
         <div class="text-gray-500 mb-8">
@@ -156,5 +157,11 @@ article {
 /* 超链接样式 */
 .prose a {
   @apply text-blue-600 hover:text-blue-800;
+}
+
+/* 代码块背景 */
+.prose pre {
+  background: rgba(30, 30, 30, 0.8) !important;
+  backdrop-filter: blur(4px);
 }
 </style> 
