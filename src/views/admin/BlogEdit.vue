@@ -3,11 +3,14 @@
     <div class="flex justify-between items-center mb-6">
       <h2 class="text-2xl font-bold text-gray-900">
         {{ isEdit ? '编辑博客' : '写博客' }}
+        <span v-if="draftTime" class="text-sm font-normal text-gray-500 ml-2">
+          (草稿保存于 {{ draftTime }})
+        </span>
       </h2>
       <div class="flex gap-4">
         <button
           type="button"
-          @click="router.back()"
+          @click="handleCancel"
           class="px-4 py-2 text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200"
         >
           取消
@@ -17,7 +20,7 @@
           :disabled="isSubmitting"
           class="px-4 py-2 text-white bg-blue-600 rounded-md hover:bg-blue-700 disabled:opacity-50"
         >
-          {{ isSubmitting ? '保存中...' : '保存' }}
+          {{ isSubmitting ? '发布中...' : '发布' }}
         </button>
       </div>
     </div>
@@ -125,7 +128,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import MarkdownIt from 'markdown-it'
 import markdownItTaskLists from 'markdown-it-task-lists'
@@ -143,6 +146,41 @@ const blog = ref({
   title: '',
   content: ''
 })
+
+// 草稿相关函数
+const DRAFT_KEY = 'blog_draft'
+
+const saveDraft = () => {
+  localStorage.setItem(DRAFT_KEY, JSON.stringify({
+    title: blog.value.title,
+    content: blog.value.content,
+    lastSaved: new Date().toISOString()
+  }))
+}
+
+const loadDraft = () => {
+  const draft = localStorage.getItem(DRAFT_KEY)
+  if (draft) {
+    const { title, content } = JSON.parse(draft)
+    blog.value.title = title
+    blog.value.content = content
+  }
+}
+
+const clearDraft = () => {
+  localStorage.removeItem(DRAFT_KEY)
+}
+
+// 监听内容变化，自动保存草稿
+watch(
+  () => ({ title: blog.value.title, content: blog.value.content }),
+  () => {
+    if (!isEdit.value) {  // 只在写新博客时保存草稿
+      saveDraft()
+    }
+  },
+  { deep: true }
+)
 
 // 初始化markdown-it及其插件
 const md = new MarkdownIt({
@@ -315,6 +353,7 @@ const handleSubmit = async () => {
     
     const data = await response.json()
     if (data.code === 1) {
+      clearDraft()  // 发布成功后清除草稿
       router.push('/adm/blogs')
     } else {
       if (data.msg === 'NOT_LOGIN') {
@@ -392,8 +431,65 @@ onMounted(() => {
   // 如果是编辑模式，获取博客详情
   if (isEdit.value) {
     fetchBlog(route.params.id)
+  } else {
+    loadDraft()  // 果是写新博客，加载草稿
   }
 })
+
+// 添加提示信息
+const getDraftTime = () => {
+  const draft = localStorage.getItem(DRAFT_KEY)
+  if (draft) {
+    const { lastSaved } = JSON.parse(draft)
+    return new Date(lastSaved).toLocaleString('zh-CN')
+  }
+  return null
+}
+
+const draftTime = computed(() => {
+  return !isEdit.value && getDraftTime()
+})
+
+// 处理取消按钮
+const handleCancel = () => {
+  if (!isEdit.value) {  // 只在写新博客时清除草稿
+    clearDraft()
+  }
+  router.back()
+}
+
+// 实际插入模板的函数
+const insertTemplate = (template) => {
+  const textarea = document.querySelector('textarea')
+  const start = textarea.selectionStart
+  const end = textarea.selectionEnd
+  const content = blog.value.content
+  blog.value.content = content.substring(0, start) + template + content.substring(end)
+  // 插入后将光标移动到合适位置
+  setTimeout(() => {
+    textarea.focus()
+    textarea.setSelectionRange(start + template.length, start + template.length)
+  }, 0)
+}
+
+// 修改插入Markdown的函数
+const insertMarkdown = async (key) => {
+  if (key === 'table') {
+    showTableDialog.value = true
+    tableRows.value = 3
+    tableCols.value = 3
+    tableError.value = ''
+  } else if (key === 'image') {
+    // 触发文件选择
+    const input = document.createElement('input')
+    input.type = 'file'
+    input.accept = 'image/*'
+    input.onchange = handleImageSelect
+    input.click()
+  } else {
+    insertTemplate(quickInserts[key].template)
+  }
+}
 </script>
 
 <style>
