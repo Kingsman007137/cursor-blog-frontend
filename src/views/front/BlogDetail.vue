@@ -152,4 +152,9 @@ onMounted(() => {
 article {
   @apply bg-white;
 }
+
+/* 超链接样式 */
+.prose a {
+  @apply text-blue-600 hover:text-blue-800;
+}
 </style> 

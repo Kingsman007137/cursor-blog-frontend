@@ -124,6 +124,50 @@
         </div>
       </div>
     </div>
+
+    <!-- 链接输入对话框 -->
+    <div v-if="showLinkDialog" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+      <div class="bg-white rounded-lg p-6 w-96">
+        <h3 class="text-lg font-medium text-gray-900 mb-4">插入超链接</h3>
+        <div class="space-y-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">链接文本</label>
+            <input
+              v-model="linkText"
+              type="text"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+              placeholder="显示的文本"
+            >
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">链接地址</label>
+            <input
+              v-model="linkUrl"
+              type="text"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+              placeholder="https://"
+            >
+          </div>
+          <div v-if="linkError" class="text-red-500 text-sm">
+            {{ linkError }}
+          </div>
+          <div class="flex justify-end gap-4">
+            <button
+              @click="showLinkDialog = false"
+              class="px-4 py-2 text-gray-700 hover:text-gray-900"
+            >
+              取消
+            </button>
+            <button
+              @click="handleLinkConfirm"
+              class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+            >
+              确定
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -202,7 +246,7 @@ const md = new MarkdownIt({
   .use(markdownItMark)
   .use(markdownItMultimdTable)
 
-// 自定义图片渲染规则
+// 自定义片渲染规则
 md.renderer.rules.image = function (tokens, idx, options, env, slf) {
   const token = tokens[idx]
   // 获取图片地址和替代文本
@@ -235,6 +279,11 @@ const quickInserts = {
     desc: '插入图片',
     template: null
   },
+  link: {
+    label: '链接',
+    desc: '插入超链接',
+    template: null
+  },
   divider: {
     label: '分割线',
     desc: '插入分割线',
@@ -257,6 +306,12 @@ const showTableDialog = ref(false)
 const tableRows = ref(3)
 const tableCols = ref(3)
 const tableError = ref('')
+
+// 链接对话框相关状态
+const showLinkDialog = ref(false)
+const linkText = ref('')
+const linkUrl = ref('')
+const linkError = ref('')
 
 // 处理图片选择
 const handleImageSelect = async (event) => {
@@ -379,7 +434,7 @@ const handleSubmit = async () => {
 // 处理表格确认
 const handleTableConfirm = () => {
   if (!tableRows.value || !tableCols.value) {
-    tableError.value = '请输入行数和列数'
+    tableError.value = '请输入行数列数'
     return
   }
   
@@ -433,7 +488,7 @@ const handleTab = (e) => {
 }
 
 onMounted(() => {
-  // 如果是编辑模式，获取博客详情
+  // 如果是编辑模式，获取博客详
   if (isEdit.value) {
     fetchBlog(route.params.id)
   } else {
@@ -491,15 +546,40 @@ const insertMarkdown = async (key) => {
     input.accept = 'image/*'
     input.onchange = handleImageSelect
     input.click()
+  } else if (key === 'link') {
+    showLinkDialog.value = true
+    linkText.value = ''
+    linkUrl.value = ''
+    linkError.value = ''
   } else {
     insertTemplate(quickInserts[key].template)
   }
+}
+
+// 处理链接确认
+const handleLinkConfirm = () => {
+  if (!linkText.value || !linkUrl.value) {
+    linkError.value = '请输入链接文本和地址'
+    return
+  }
+  
+  const linkMarkdown = `[${linkText.value}](${linkUrl.value})`
+  insertTemplate(linkMarkdown)
+  showLinkDialog.value = false
+  linkText.value = ''
+  linkUrl.value = ''
+  linkError.value = ''
 }
 </script>
 
 <style>
 .prose {
   @apply max-w-none;
+}
+
+/* 超链接样式 */
+.prose a {
+  @apply text-blue-600 hover:text-blue-800;
 }
 
 /* 正文字体大小 */
