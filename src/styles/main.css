@@ -4,14 +4,10 @@
 
 /* 全局背景样式 */
 body {
-  background-color: #e1d19d;  /* 更黄的护眼色 */
-  background-image: 
-    radial-gradient(circle at 50% 50%, rgba(212, 180, 131, 0.1) 25%, transparent 25%),
-    radial-gradient(circle at 0% 0%, rgba(212, 180, 131, 0.1) 25%, transparent 25%),
-    radial-gradient(circle at 0% 100%, rgba(212, 180, 131, 0.1) 25%, transparent 25%),
-    radial-gradient(circle at 100% 0%, rgba(212, 180, 131, 0.1) 25%, transparent 25%),
-    radial-gradient(circle at 100% 100%, rgba(212, 180, 131, 0.1) 25%, transparent 25%);
-  background-size: 40px 40px;
+  background-image: url('@/assets/R.jpg');
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
   min-height: 100vh;
 }
 
@@ -25,11 +21,12 @@ body {
 .blog-card {
   transition: all 0.3s ease;
   backdrop-filter: blur(8px);
-  background: rgba(233, 211, 12, 0.15);
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .blog-card:hover {
   transform: translateY(-2px);
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.05);
-  background: rgba(245, 209, 9, 0.25);
+  background: rgba(255, 255, 255, 0.25);
 } 
