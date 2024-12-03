@@ -28,8 +28,6 @@ const md = new MarkdownIt({
   html: true,
   breaks: true,
   linkify: true,
-  xhtmlOut: true,
-  typographer: true,
   highlight: function (str, lang) {
     if (lang && hljs.getLanguage(lang)) {
       try {
@@ -41,6 +39,27 @@ const md = new MarkdownIt({
     return '<pre class="hljs"><code>' + md.utils.escapeHtml(str) + '</code></pre>';
   }
 })
+
+// 自定义图片渲染规则
+md.renderer.rules.image = function (tokens, idx, options, env, slf) {
+  const token = tokens[idx]
+  // 获取图片地址和替代文本
+  const src = token.attrGet('src')
+  let alt = token.content
+  
+  // 检查是否包含大小信息
+  const match = alt.match(/^(.+?)\|(\d+)$/)
+  if (match) {
+    // 提取图片名称和大小
+    alt = match[1]
+    const size = match[2]
+    // 返回带有宽度样式的img标签
+    return `<img src="${src}" alt="${alt}" style="width: ${size}%" />`
+  }
+  
+  // 如果没有大小信息，返回普通img标签
+  return `<img src="${src}" alt="${alt}" />`
+}
 
 const fetchBlog = async (id) => {
   try {

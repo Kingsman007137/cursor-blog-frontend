@@ -149,8 +149,6 @@ const md = new MarkdownIt({
   html: true,
   breaks: true,
   linkify: true,
-  xhtmlOut: true,
-  typographer: true,
   highlight: function (str, lang) {
     if (lang && hljs.getLanguage(lang)) {
       try {
@@ -165,6 +163,27 @@ const md = new MarkdownIt({
   .use(markdownItTaskLists)
   .use(markdownItMark)
   .use(markdownItMultimdTable)
+
+// 自定义图片渲染规则
+md.renderer.rules.image = function (tokens, idx, options, env, slf) {
+  const token = tokens[idx]
+  // 获取图片地址和替代文本
+  const src = token.attrGet('src')
+  let alt = token.content
+  
+  // 检查是否包含大小信息
+  const match = alt.match(/^(.+?)\|(\d+)$/)
+  if (match) {
+    // 提取图片名称和大小
+    alt = match[1]
+    const size = match[2]
+    // 返回带有宽度样式的img标签
+    return `<img src="${src}" alt="${alt}" style="width: ${size}%" />`
+  }
+  
+  // 如果没有大小信息，返回普通img标签
+  return `<img src="${src}" alt="${alt}" />`
+}
 
 // 快速插入的Markdown模板
 const quickInserts = {
@@ -196,37 +215,36 @@ const tableRows = ref(3)
 const tableCols = ref(3)
 const tableError = ref('')
 
-// 修改插入Markdown的函数
-const insertMarkdown = async (key) => {
-  if (key === 'table') {
-    showTableDialog.value = true
-    tableRows.value = 3
-    tableCols.value = 3
-    tableError.value = ''
-  } else if (key === 'image') {
-    // 触发文件选择
-    const input = document.createElement('input')
-    input.type = 'file'
-    input.accept = 'image/*'
-    input.onchange = handleImageSelect
-    input.click()
-  } else {
-    insertTemplate(quickInserts[key].template)
+// 处理图片选择
+const handleImageSelect = async (event) => {
+  const file = event.target.files[0]
+  if (!file) return
+  
+  const formData = new FormData()
+  formData.append('file', file)
+  
+  try {
+    const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/adm/images/upload`, {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'token': localStorage.getItem('token')
+      },
+      body: formData
+    })
+    
+    const data = await response.json()
+    if (data.code === 1) {
+      // 直接插入图片的Markdown语法
+      const imageMarkdown = `\n![${file.name}](${data.data})\n`
+      insertTemplate(imageMarkdown)
+    } else {
+      errorMsg.value = data.msg || '上传图片失败'
+    }
+  } catch (error) {
+    console.error('上传图片失败:', error)
+    errorMsg.value = '上传图片失败，请重试'
   }
-}
-
-// 实际插入模板的函数
-const insertTemplate = (template) => {
-  const textarea = document.querySelector('textarea')
-  const start = textarea.selectionStart
-  const end = textarea.selectionEnd
-  const content = blog.value.content
-  blog.value.content = content.substring(0, start) + template + content.substring(end)
-  // 插入后将光标移动到合适位置
-  setTimeout(() => {
-    textarea.focus()
-    textarea.setSelectionRange(start + template.length, start + template.length)
-  }, 0)
 }
 
 const isEdit = computed(() => route.params.id !== undefined)
@@ -368,38 +386,6 @@ const handleTab = (e) => {
   setTimeout(() => {
     textarea.selectionStart = textarea.selectionEnd = start + 4
   }, 0)
-}
-
-// 处理图片选择
-const handleImageSelect = async (event) => {
-  const file = event.target.files[0]
-  if (!file) return
-  
-  const formData = new FormData()
-  formData.append('file', file)
-  
-  try {
-    const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/adm/images/upload`, {
-      method: 'POST',
-      headers: {
-        'Accept': 'application/json',
-        'token': localStorage.getItem('token')
-      },
-      body: formData
-    })
-    
-    const data = await response.json()
-    if (data.code === 1) {
-      // 插入图片的Markdown语法
-      const imageMarkdown = `\n![${file.name}](${data.data})\n`
-      insertTemplate(imageMarkdown)
-    } else {
-      errorMsg.value = data.msg || '上传图片失败'
-    }
-  } catch (error) {
-    console.error('上传图片失败:', error)
-    errorMsg.value = '上传图片失败，请重试'
-  }
 }
 
 onMounted(() => {
