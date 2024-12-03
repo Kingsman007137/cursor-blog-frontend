@@ -235,6 +235,11 @@ const quickInserts = {
     desc: '插入图片',
     template: null
   },
+  divider: {
+    label: '分割线',
+    desc: '插入分割线',
+    template: '\n\n---\n\n'
+  },
   code: {
     label: '代码块',
     desc: '插入代码块',
@@ -243,7 +248,7 @@ const quickInserts = {
   quote: {
     label: '引用',
     desc: '插入引用文本',
-    template: '\n> 引用文本\n'
+    template: '\n> 引用的文本\n'
   }
 }
 
@@ -497,6 +502,26 @@ const insertMarkdown = async (key) => {
   @apply max-w-none;
 }
 
+/* 分割线样式 */
+.prose hr {
+  @apply my-8 border-0 border-b-2 border-gray-300;
+}
+
+/* 引用样式 */
+.prose blockquote {
+  @apply border-l-4 border-blue-300 pl-4 my-4 bg-blue-50 py-2;
+}
+
+/* 引用文本样式 */
+.prose blockquote p::before,
+.prose blockquote p::after {
+  content: none !important;
+}
+
+.prose blockquote p {
+  @apply text-gray-800 not-italic;
+}
+
 /* 图片容器样式 */
 .prose p:has(img) {
   @apply flex justify-center;
@@ -540,9 +565,6 @@ const insertMarkdown = async (key) => {
 }
 .prose input[type="checkbox"] {
   @apply mr-2;
-}
-.prose blockquote {
-  @apply border-l-4 border-gray-200 pl-4 italic my-4;
 }
 .prose pre {
   @apply bg-[#1E1E1E] rounded-lg p-4 mb-4 overflow-x-auto;
