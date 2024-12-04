@@ -117,6 +117,7 @@ const renderedContent = computed(() => {
 
 onMounted(() => {
   fetchBlog(route.params.id)
+  window.scrollTo(0, 0)
 })
 </script>
 
