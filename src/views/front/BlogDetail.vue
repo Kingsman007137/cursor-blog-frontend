@@ -143,6 +143,7 @@ onMounted(() => {
   @apply mb-4 text-base;
   font-size: 1.1em;
   line-height: 1.2;
+  color: #1a1a1a;
 }
 .prose pre {
   @apply bg-transparent;
@@ -193,14 +194,14 @@ article {
 
 /* 引用样式 */
 .prose blockquote {
-  @apply border-l-4 border-fuchsia-400 pl-4 my-4 py-2;
+  @apply border-l-4 border-purple-500 pl-4 my-4 py-2;
   background: rgba(219, 234, 254, 0.2);
 }
 
 /* 高亮显示样式 */
 .prose mark {
   @apply px-1;
-  background: rgba(167, 139, 250, 0.8);  /* 深紫色半透明背景 */
+  background: rgba(250, 253, 39, 0.6);
 }
 
 /* 列表样式 */
@@ -209,7 +210,7 @@ article {
 }
 
 .prose ul li::marker {
-  color: #1f2937;  /* 深灰色标号 (gray-800) */
+  color: #4b5563;
 }
 
 .prose ol {

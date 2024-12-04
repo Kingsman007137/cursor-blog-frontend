@@ -592,6 +592,7 @@ md.renderer.rules.code_inline = function(tokens, idx) {
   @apply mb-4 text-base;
   font-size: 1.1em;
   line-height: 1.2;
+  color: #1a1a1a;  /* 更深的字体颜色 */
 }
 
 /* 分割线样式 */
@@ -601,7 +602,7 @@ md.renderer.rules.code_inline = function(tokens, idx) {
 
 /* 引用样式 */
 .prose blockquote {
-  @apply border-l-4 border-fuchsia-400 pl-4 my-4 py-2;
+  @apply border-l-4 border-purple-500 pl-4 my-4 py-2;
   background: rgba(219, 234, 254, 0.2);
 }
 
@@ -643,7 +644,7 @@ md.renderer.rules.code_inline = function(tokens, idx) {
 }
 
 .prose ul li::marker {
-  color: #1f2937;  /* 深灰色标号 (gray-800) */
+  color: #4b5563;  /* 更浅的灰色标号 */
 }
 
 .prose ol {
@@ -663,7 +664,7 @@ md.renderer.rules.code_inline = function(tokens, idx) {
 }
 .prose mark {
   @apply px-1;
-  background: rgba(167, 139, 250, 0.8);  /* 深紫色半透明背景 */
+  background: rgba(247, 236, 13, 0.6);  /* 黄色半透明背景 */
 }
 .prose input[type="checkbox"] {
   @apply mr-2;
