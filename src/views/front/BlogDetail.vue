@@ -1,7 +1,7 @@
 <template>
   <div class="container mx-auto">
     <article class="max-w-5xl mx-auto overflow-hidden w-4/5 backdrop-blur-md border-x border-white/20"
-     style="background: rgba(255, 255, 255, 0.15); min-height: calc(100vh - 64px); border: 1px solid rgba(255, 255, 255, 0.2);">
+     style="background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(3px); min-height: calc(100vh - 64px); border: 1px solid rgba(255, 255, 255, 0.2);">
       <div class="p-8">
         <h1 class="text-4xl font-bold text-gray-900 mb-4">{{ blog.title }}</h1>
         <div class="text-gray-500 mb-8">

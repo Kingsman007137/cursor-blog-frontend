@@ -4,7 +4,7 @@
 
 /* 全局背景样式 */
 body {
-  background-image: url('@/assets/R.jpg');
+  background-image: url('@/assets/0.png');
   background-size: cover;
   background-position: center;
   background-attachment: fixed;
@@ -13,20 +13,20 @@ body {
 
 /* 让内容区域有轻微的透明度 */
 .bg-white {
-  background-color: rgba(255, 255, 255, 0.5) !important;
-  backdrop-filter: blur(5px);
+  background-color: rgba(255, 255, 255, 0.2) !important;
+  backdrop-filter: blur(4px);
 }
 
 /* 博客卡片毛玻璃效果 */
 .blog-card {
   transition: all 0.3s ease;
-  backdrop-filter: blur(8px);
-  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(3px);
+  background: rgba(255, 255, 255, 0.1);
   border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .blog-card:hover {
   transform: translateY(-2px);
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.05);
-  background: rgba(255, 255, 255, 0.25);
+  background: rgba(255, 255, 255, 0.15);
 } 
