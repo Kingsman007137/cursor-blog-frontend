@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen bg-gray-100">
+  <div class="min-h-screen">
     <!-- 主要内容区域 -->
     <div class="py-6">
       <div :class="{
