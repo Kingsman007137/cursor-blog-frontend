@@ -183,7 +183,11 @@ const groupedBlogs = computed(() => {
     if (!groups[month]) {
       groups[month] = []
     }
-    groups[month].push(blog)
+    groups[month].push({
+      id: blog.id,
+      title: blog.title,
+      createdAt: blog.createdAt
+    })
   })
   return groups
 })
