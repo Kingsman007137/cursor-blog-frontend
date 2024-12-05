@@ -50,28 +50,62 @@
     </div>
     
     <!-- 博客列表 -->
-    <div v-else class="grid gap-4">
-      <article v-for="blog in blogs" :key="blog.id" 
-        class="blog-card rounded-lg overflow-hidden border border-white/20 transition-all duration-300"
-        style="backdrop-filter: blur(8px); background: rgba(255, 255, 255, 0.3);">
-        <div class="px-6 py-4">
-          <h2 class="text-2xl font-bold mb-3 text-gray-800">{{ blog.title }}</h2>
-          <p class="text-gray-600 mb-2 line-clamp-2">{{ getContentPreview(blog.content) }}</p>
-          <div class="flex justify-between items-center">
-            <span class="text-sm text-gray-500">{{ formatDate(blog.createdAt) }}</span>
-            <router-link :to="`/blogs/${blog.id}`" 
-              class="text-blue-600 hover:text-blue-800 font-medium">
-              阅读更多 →
-            </router-link>
+    <div v-else class="container mx-auto">
+      <div class="flex gap-8">
+        <!-- 月份文字 -->
+        <div class="w-32 flex-shrink-0">
+          <div v-for="(monthBlogs, month) in groupedBlogs" :key="month" 
+            class="flex items-start justify-end"
+            :style="`height: ${monthBlogs.length * 90 + (monthBlogs.length - 1) * 16 + 32}px`"
+          >
+            <div class="text-lg font-bold text-gray-800">{{ month }}</div>
           </div>
         </div>
-      </article>
+        
+        <!-- 时间线 -->
+        <div class="relative w-8 flex-shrink-0">
+          <div class="absolute top-0 bottom-0 left-[18px] w-[2px] bg-gray-400"></div>
+          <div v-for="(monthBlogs, month) in groupedBlogs" :key="month" 
+            class="relative"
+            :style="`height: ${monthBlogs.length * 90 + (monthBlogs.length - 1) * 16 + 32}px`"
+          >
+            <div class="w-4 h-4 rounded-full bg-white border-2 border-gray-500 absolute left-[11px] top-3 z-10 shadow-md"></div>
+          </div>
+        </div>
+        
+        <!-- 博客列表 -->
+        <div class="flex-grow">
+          <div v-for="(monthBlogs, month) in groupedBlogs" :key="month" 
+            class="mb-8 mt-6"
+          >
+            <div class="space-y-4">
+              <article v-for="blog in monthBlogs" :key="blog.id" 
+                class="blog-card rounded-lg overflow-hidden border border-white/20 transition-all duration-300"
+                style="backdrop-filter: blur(8px); background: rgba(255, 255, 255, 0.3);">
+                <div class="px-6 py-3">
+                  <h2>
+                    <router-link 
+                      :to="`/blogs/${blog.id}`" 
+                      class="text-2xl font-bold text-gray-800 hover:text-gray-900"
+                    >
+                      {{ blog.title }}
+                    </router-link>
+                  </h2>
+                  <div class="mt-2">
+                    <span class="text-sm text-gray-500">{{ formatDate(blog.createdAt) }}</span>
+                  </div>
+                </div>
+              </article>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted, watch } from 'vue'
+import { ref, onMounted, watch, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
 const route = useRoute()
@@ -118,7 +152,7 @@ const fetchBlogs = async () => {
     }
   } catch (error) {
     console.error('获取博客列表失败:', error)
-    errorMsg.value = '网络错误，请稍后重试'
+    errorMsg.value = '网络错误，稍后重试'
   } finally {
     isLoading.value = false
   }
@@ -157,7 +191,28 @@ const getContentPreview = (content) => {
   return plainText.length > 100 ? plainText.slice(0, 100) + '...' : plainText
 }
 
+// 按月份分组的计算属性
+const groupedBlogs = computed(() => {
+  const groups = {}
+  blogs.value.forEach(blog => {
+    const date = new Date(blog.createdAt)
+    const month = date.toLocaleString('zh-CN', { year: 'numeric', month: 'long' })
+    if (!groups[month]) {
+      groups[month] = []
+    }
+    groups[month].push(blog)
+  })
+  return groups
+})
+
 onMounted(() => {
   fetchBlogs()
 })
 </script> 
+
+<style>
+/* 确保时间线的点和线始终可见 */
+.sticky {
+  z-index: 10;
+}
+</style>
