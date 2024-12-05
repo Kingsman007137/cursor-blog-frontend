@@ -1,8 +1,46 @@
 <template>
   <div>
     <div class="flex justify-between items-center mb-6">
-      <h2 class="text-2xl font-bold text-gray-900">博客管理</h2>
-      <div class="flex gap-4">
+      <div class="flex items-center gap-4">
+        <h2 class="text-2xl font-bold text-gray-900">博客管理</h2>
+        <button
+          v-if="isSearching"
+          @click="handleBack"
+          class="text-blue-600 hover:text-blue-800 flex items-center gap-1"
+        >
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+          </svg>
+          返回全部博客
+        </button>
+      </div>
+      <div class="flex items-center gap-4">
+        <!-- 搜索框 -->
+        <div class="relative flex items-center">
+          <input
+            type="text"
+            v-model="searchQuery"
+            placeholder="搜索文章..."
+            class="w-64 px-4 py-2 pr-10 rounded-lg border border-gray-300/50 bg-white/10 backdrop-blur-md focus:outline-none focus:ring-2 focus:ring-blue-500/50 text-gray-800 placeholder-gray-500 shadow-inner"
+          />
+          <button 
+            @click="handleSearch"
+            class="absolute right-2 p-1 rounded-full hover:bg-white/20 transition-colors duration-200"
+          >
+            <svg
+              class="h-5 w-5 text-gray-600 hover:text-gray-900"
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 20 20"
+              fill="currentColor"
+            >
+              <path
+                fill-rule="evenodd"
+                d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
+                clip-rule="evenodd"
+              />
+            </svg>
+          </button>
+        </div>
         <router-link 
           to="/adm/blogs/create"
           class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
@@ -20,7 +58,7 @@
 
     <!-- 错误提示 -->
     <div v-if="errorMsg" class="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
-      <p class="text-red-600">{{ errorMsg }}</p>
+      <p class="text-red-600 text-xl font-bold">{{ errorMsg }}</p>
     </div>
 
     <!-- 博客列表 -->
@@ -93,6 +131,8 @@ const blogs = ref([])
 const showDeleteModal = ref(false)
 const blogToDelete = ref(null)
 const errorMsg = ref('')
+const searchQuery = ref('')
+const isSearching = ref(false)
 
 const handleLogout = () => {
   localStorage.removeItem('token')
@@ -196,7 +236,7 @@ const formatDate = (dateString) => {
       minute: '2-digit'
     })
   } catch (error) {
-    return '日期格式错误'
+    return '日期式错误'
   }
 }
 
@@ -215,6 +255,58 @@ const getContentPreview = (content) => {
     .replace(/>/g, '')          // 移除引用
     .trim()
   return plainText.length > 100 ? plainText.slice(0, 100) + '...' : plainText
+}
+
+// 处理搜索
+const handleSearch = async () => {
+  if (!searchQuery.value.trim()) {
+    isSearching.value = false
+    await fetchBlogs()
+    return
+  }
+  
+  try {
+    const token = localStorage.getItem('token')
+    if (!token) {
+      router.replace('/adm/login')
+      return
+    }
+
+    const response = await fetch(
+      `${import.meta.env.VITE_API_BASE_URL}/adm/blogs/search?title=${encodeURIComponent(searchQuery.value)}`,
+      {
+        headers: {
+          'Accept': 'application/json',
+          'token': token
+        }
+      }
+    )
+    if (response.status === 401) {
+      localStorage.removeItem('token')
+      router.replace('/adm/login')
+      return
+    }
+    const data = await response.json()
+    if (data.code === 1) {
+      blogs.value = data.data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+      isSearching.value = true
+    } else {
+      blogs.value = []
+      errorMsg.value = data.msg || '没有找到匹配的博客'
+      isSearching.value = true
+    }
+  } catch (error) {
+    console.error('搜索博客失败:', error)
+    errorMsg.value = '搜索失败，请稍后重试'
+  }
+}
+
+// 处理返回
+const handleBack = () => {
+  searchQuery.value = ''
+  isSearching.value = false
+  errorMsg.value = ''
+  fetchBlogs()
 }
 
 onMounted(() => {
