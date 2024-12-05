@@ -152,7 +152,7 @@ const fetchBlogs = async () => {
     }
   } catch (error) {
     console.error('获取博客列表失败:', error)
-    errorMsg.value = '网络错误，稍后重试'
+    errorMsg.value = '网络错误，请稍后重试'
   } finally {
     isLoading.value = false
   }
@@ -172,23 +172,6 @@ const formatDate = (dateString) => {
   } catch (error) {
     return '日期格式错误'
   }
-}
-
-// 获取内容预览
-const getContentPreview = (content) => {
-  if (!content) return '无内容'
-  // 移除Markdown语法标记
-  const plainText = content
-    .replace(/#{1,6} /g, '')     // 移除标题
-    .replace(/\*\*/g, '')        // 除加粗
-    .replace(/\*/g, '')          // 移除斜体
-    .replace(/`{3}[\s\S]*?`{3}/g, '') // 移除代码块
-    .replace(/`.*?`/g, '')      // 移除行内代码
-    .replace(/\[.*?\]\(.*?\)/g, '') // 移除链接
-    .replace(/!\[.*?\]\(.*?\)/g, '') // 移除图片
-    .replace(/>/g, '')          // 移除引用
-    .trim()
-  return plainText.length > 100 ? plainText.slice(0, 100) + '...' : plainText
 }
 
 // 按月份分组的计算属性
