@@ -1,17 +1,25 @@
 <template>
-  <div class="container mx-auto">
-    <article class="max-w-5xl mx-auto overflow-hidden w-4/5 backdrop-blur-md border-x border-white/20"
-     style="background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(3px); min-height: calc(100vh - 64px); border: 1px solid rgba(255, 255, 255, 0.2);">
-      <div class="p-8">
-        <h1 class="text-4xl font-bold text-gray-900 mb-4">{{ blog.title }}</h1>
-        <div class="text-gray-500 mb-8">
-          发布于 {{ formatDate(blog.createdAt) }}
-          <span v-if="blog.updatedAt !== blog.createdAt">
-            · 最近修改于 {{ formatDate(blog.updatedAt) }}
-          </span>
-        </div>
-        <div class="prose max-w-none" v-html="renderedContent"></div>
+  <div class="container mx-auto px-4 min-h-[calc(100vh-4rem)] mt-16">
+    <!-- 加载状态 -->
+    <div v-if="isLoading" class="flex justify-center items-center py-12">
+      <!-- ... loading SVG ... -->
+    </div>
+
+    <!-- 错误提示 -->
+    <div v-else-if="errorMsg" class="text-center py-12">
+      <!-- ... error message ... -->
+    </div>
+
+    <!-- 博客内容 -->
+    <article v-else class="prose mx-auto bg-white/10 backdrop-blur-[2px] p-8 max-w-5xl min-h-[calc(100vh-4rem-4rem)]">
+      <h1 class="blog-title font-bold text-gray-900 mb-4">{{ blog.title }}</h1>
+      <div class="text-base text-gray-500 mb-8 flex items-center gap-2">
+        <span>发布于 {{ formatDate(blog.createdAt) }}</span>
+        <span v-if="blog.updatedAt && blog.updatedAt !== blog.createdAt">
+          · 修改于 {{ formatDate(blog.updatedAt) }}
+        </span>
       </div>
+      <div class="markdown-body" v-html="renderedContent"></div>
     </article>
   </div>
 </template>
@@ -136,9 +144,11 @@ onMounted(() => {
 }
 .prose h1 {
   @apply text-2xl font-bold mb-4;
+  margin-top: 1em;
 }
 .prose h2 {
   @apply text-xl font-bold mb-3;
+  margin-top: 0.8em;
 }
 .prose p {
   @apply mb-4 text-base;
@@ -207,14 +217,36 @@ article {
 
 /* 列表样式 */
 .prose ul {
-  @apply list-disc pl-5 mb-4;
+  @apply list-disc pl-5 mb-1;
 }
 
 .prose ul li::marker {
   color: #4b5563;
 }
 
+.prose ul li,
+.prose ol li {
+  margin-top: 0.1em;
+  margin-bottom: 0.1em;
+}
+
 .prose ol {
-  @apply list-decimal pl-5 mb-4;
+  @apply list-decimal pl-5 mb-1;
+}
+
+.prose ul.contains-task-list {
+  @apply mb-1;
+}
+
+.prose ul.contains-task-list li {
+  margin-top: 0.1em;
+  margin-bottom: 0.1em;
+}
+</style>
+
+<style scoped>
+.blog-title {
+  font-size: 2rem;  /* 96px */
+  line-height: 1.2;
 }
 </style> 
