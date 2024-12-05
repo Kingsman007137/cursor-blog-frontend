@@ -6,7 +6,13 @@
         <div class="flex justify-between items-center h-16">
           <div class="flex">
             <div class="flex-shrink-0 flex items-center">
-              <router-link to="/" class="text-2xl font-bold text-gray-900 hover:text-black">首页</router-link>
+              <a 
+                href="javascript:void(0)" 
+                @click="handleHomeClick" 
+                class="text-2xl font-bold text-gray-900 hover:text-black cursor-pointer"
+              >
+                首页
+              </a>
             </div>
           </div>
           <!-- 提示图标 -->
@@ -21,7 +27,7 @@
             </div>
             <!-- 悬停提示卡片 -->
             <div class="absolute right-0 w-96 p-6 mt-2 bg-white/10 backdrop-blur-2xl rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 text-lg font-bold text-gray-800 whitespace-nowrap text-center">
-              彩蛋：<span class="text-blue-600 hover:text-blue-800 cursor-pointer" onclick="window.location.reload()">刷新</span>页面可以体验不一样的背景哦✨
+              彩蛋：<span class="text-blue-600 hover:text-blue-800 cursor-pointer" onclick="window.location.reload()">刷新</span>页面可以体验不一样背景哦✨
             </div>
           </div>
         </div>
@@ -30,7 +36,24 @@
 
     <!-- 主要内容区域 -->
     <main class="mt-16">
-      <router-view></router-view>
+      <router-view ref="currentView"></router-view>
     </main>
   </div>
 </template> 
+
+<script setup>
+import { useRouter, useRoute } from 'vue-router'
+import { ref } from 'vue'
+
+const router = useRouter()
+const route = useRoute()
+const currentView = ref(null)
+
+const handleHomeClick = () => {
+  if (route.path === '/blogs' && currentView.value?.resetAndFetch) {
+    currentView.value.resetAndFetch()
+  } else {
+    router.push('/')
+  }
+}
+</script> 

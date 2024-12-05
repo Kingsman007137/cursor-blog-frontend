@@ -17,6 +17,10 @@ const routes = [
     component: BlogList
   },
   {
+    path: '/blogs/search',
+    component: () => import('./views/front/BlogSearch.vue')
+  },
+  {
     path: '/blogs/:id',
     component: BlogDetail
   },

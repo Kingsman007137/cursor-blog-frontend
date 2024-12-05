@@ -1,7 +1,7 @@
 <template>
   <div class="container mx-auto px-4 py-8">
     <div class="flex justify-between items-center mb-8">
-      <h1 class="text-3xl font-bold text-gray-800">我的文章</h1>
+      <h1 class="text-3xl font-bold text-gray-800">搜索结果</h1>
       <!-- 搜索框 -->
       <div class="relative flex items-center">
         <input
@@ -41,12 +41,6 @@
     <!-- 错误提示 -->
     <div v-else-if="errorMsg" class="text-center py-12">
       <p class="text-red-500 text-xl font-bold">{{ errorMsg }}</p>
-      <button 
-        @click="fetchBlogs" 
-        class="mt-4 text-blue-600 hover:text-blue-800"
-      >
-        重试
-      </button>
     </div>
     
     <!-- 博客列表 -->
@@ -71,7 +65,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, watch } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
 const route = useRoute()
@@ -84,41 +78,35 @@ const searchQuery = ref('')
 // 处理搜索
 const handleSearch = async () => {
   if (!searchQuery.value.trim()) {
+    router.push('/blogs')
     return
   }
-  router.push({
-    path: '/blogs/search',
-    query: { title: searchQuery.value }
-  })
+  await fetchSearchResults()
 }
 
-// 监听路由变化
-watch(() => route.path, (newPath) => {
-  if (newPath === '/blogs' && route.path === '/blogs/search') {
-    searchQuery.value = ''
-    fetchBlogs()
-  }
-})
-
-const fetchBlogs = async () => {
+const fetchSearchResults = async () => {
   isLoading.value = true
   errorMsg.value = ''
   
   try {
-    const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/blogs`, {
-      headers: {
-        'Accept': 'application/json'
+    const response = await fetch(
+      `${import.meta.env.VITE_API_BASE_URL}/blogs/search?title=${encodeURIComponent(searchQuery.value)}`,
+      {
+        headers: {
+          'Accept': 'application/json'
+        }
       }
-    })
+    )
     const data = await response.json()
     if (data.code === 1) {
       blogs.value = data.data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
     } else {
-      errorMsg.value = data.msg || '获取博客列表失败'
+      blogs.value = []
+      errorMsg.value = data.msg || '没有找到匹配的博客'
     }
   } catch (error) {
-    console.error('获取博客列表失败:', error)
-    errorMsg.value = '网络错误，请稍后重试'
+    console.error('搜索博客失败:', error)
+    errorMsg.value = '搜索失败，请稍后重试'
   } finally {
     isLoading.value = false
   }
@@ -142,22 +130,24 @@ const formatDate = (dateString) => {
 
 // 获取内容预览
 const getContentPreview = (content) => {
-  if (!content) return '无内容'
-  // 移除Markdown语法标记
+  if (!content) return '暂无内容'
   const plainText = content
-    .replace(/#{1,6} /g, '')     // 移除标题
-    .replace(/\*\*/g, '')        // 除加粗
-    .replace(/\*/g, '')          // 移除斜体
-    .replace(/`{3}[\s\S]*?`{3}/g, '') // 移除代码块
-    .replace(/`.*?`/g, '')      // 移除行内代码
-    .replace(/\[.*?\]\(.*?\)/g, '') // 移除链接
-    .replace(/!\[.*?\]\(.*?\)/g, '') // 移除图片
-    .replace(/>/g, '')          // 移除引用
+    .replace(/#{1,6} /g, '')
+    .replace(/\*\*/g, '')
+    .replace(/\*/g, '')
+    .replace(/`{3}[\s\S]*?`{3}/g, '')
+    .replace(/`.*?`/g, '')
+    .replace(/\[.*?\]\(.*?\)/g, '')
+    .replace(/!\[.*?\]\(.*?\)/g, '')
+    .replace(/>/g, '')
     .trim()
   return plainText.length > 100 ? plainText.slice(0, 100) + '...' : plainText
 }
 
 onMounted(() => {
-  fetchBlogs()
+  searchQuery.value = route.query.title || ''
+  if (searchQuery.value) {
+    fetchSearchResults()
+  }
 })
 </script> 
