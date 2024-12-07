@@ -24,6 +24,11 @@ const routes = [
     path: '/blogs/:id',
     component: BlogDetail
   },
+  {
+    path: '/blogs/about',
+    name: 'About',
+    component: () => import('@/views/front/About.vue')
+  },
   
   // 后台路由
   {
