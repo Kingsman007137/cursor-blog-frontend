@@ -35,7 +35,8 @@
                 </svg>
               </div>
               <!-- 彩蛋提示卡片 -->
-              <div class="absolute right-0 w-96 p-6 mt-2 bg-white/10 backdrop-blur-2xl rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 text-lg font-bold text-gray-800 whitespace-nowrap text-center">
+              <div class="absolute right-0 w-96 p-6 mt-2 rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 text-lg font-bold text-gray-800 whitespace-nowrap text-center"
+                   style="backdrop-filter: blur(20px) saturate(180%); background: rgba(255, 255, 255, 0.5);">
                 彩蛋：<span class="text-blue-600 hover:text-blue-800 cursor-pointer" onclick="window.location.reload()">刷新</span>页面可以体验不一样背景哦✨
               </div>
             </div>
@@ -49,7 +50,8 @@
                 </svg>
               </div>
               <!-- 打赏面板 -->
-              <div class="absolute right-0 w-80 p-6 mt-2 bg-white/20 backdrop-blur-5xl rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300">
+              <div class="absolute right-0 w-80 p-6 mt-2 rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300"
+                   style="backdrop-filter: blur(20px) saturate(180%); background: rgba(255, 255, 255, 0.9);">
                 <img src="@/assets/wechat-pay.jpg" alt="微信打赏码" class="w-full rounded-lg shadow-md">
                 <p class="mt-3 text-center text-gray-800 font-medium text-lg">感谢您的支持 ❤️</p>
               </div>
