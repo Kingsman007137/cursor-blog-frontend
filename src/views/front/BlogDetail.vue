@@ -11,7 +11,7 @@
     </div>
 
     <!-- 博客内容 -->
-    <article v-else class="prose mx-auto bg-white/10 backdrop-blur-[2px] p-8 max-w-5xl min-h-[calc(100vh-4rem-4rem)]">
+    <article v-else class="prose mx-auto bg-white/10 backdrop-blur-[7px] p-8 max-w-5xl min-h-[calc(100vh-4rem-4rem)]">
       <h1 class="blog-title font-bold text-gray-900 mb-4">{{ blog.title }}</h1>
       <div class="text-base text-gray-500 mb-8 flex items-center gap-2">
         <span>发布于 {{ formatDate(blog.createdAt) }}</span>
