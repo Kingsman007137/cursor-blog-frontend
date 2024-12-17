@@ -172,7 +172,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, watch } from 'vue'
+import { ref, computed, onMounted, watch, nextTick } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import MarkdownIt from 'markdown-it'
 import markdownItTaskLists from 'markdown-it-task-lists'
@@ -315,6 +315,10 @@ const linkError = ref('')
 
 // 处理图片选择
 const handleImageSelect = async (event) => {
+  const textarea = document.querySelector('textarea')
+  const cursorPosition = textarea.selectionStart
+  const scrollTop = textarea.scrollTop  // 保存当前滚动位置
+  
   const file = event.target.files[0]
   if (!file) return
   
@@ -334,14 +338,23 @@ const handleImageSelect = async (event) => {
     const data = await response.json()
     if (data.code === 1) {
       // 直接插入图片的Markdown语法
-      const imageMarkdown = `\n![${file.name}](${data.data})\n`
-      insertTemplate(imageMarkdown)
+      const imageMarkdown = `![图片|50](${data.data})`
+      const content = blog.value.content
+      blog.value.content = content.substring(0, cursorPosition) + imageMarkdown + content.substring(cursorPosition)
+      
+      // 在下一个事件循环中设置光标位置和滚动位置
+      nextTick(() => {
+        textarea.focus()
+        const newPosition = cursorPosition + imageMarkdown.length
+        textarea.setSelectionRange(newPosition, newPosition)
+        textarea.scrollTop = scrollTop  // 恢复滚动位置
+      })
     } else {
       errorMsg.value = data.msg || '上传图片失败'
     }
   } catch (error) {
     console.error('上传图片失败:', error)
-    errorMsg.value = '上传图片失败，请重试'
+    errorMsg.value = '上传图片失败，请稍后重试'
   }
 }
 
@@ -474,17 +487,21 @@ const handleTableConfirm = () => {
 
 // 处理Tab键
 const handleTab = (e) => {
+  e.preventDefault()  // 阻止默认的tab行为
   const textarea = e.target
   const start = textarea.selectionStart
   const end = textarea.selectionEnd
+  const scrollTop = textarea.scrollTop  // 保存当前滚动位置
   
   // 在光标位置插入4个空格
   blog.value.content = blog.value.content.substring(0, start) + '    ' + blog.value.content.substring(end)
   
-  // 将光标移动到插入空格后的位置
-  setTimeout(() => {
-    textarea.selectionStart = textarea.selectionEnd = start + 4
-  }, 0)
+  // 在下一个事件循环中设置光标位置和滚动位置
+  nextTick(() => {
+    textarea.focus()
+    textarea.setSelectionRange(start + 4, start + 4)
+    textarea.scrollTop = scrollTop  // 恢复滚动位置
+  })
 }
 
 onMounted(() => {
@@ -518,18 +535,22 @@ const handleCancel = () => {
   router.back()
 }
 
-// 实插入模的函数
+// 修改插入模板的函数
 const insertTemplate = (template) => {
   const textarea = document.querySelector('textarea')
   const start = textarea.selectionStart
   const end = textarea.selectionEnd
+  const scrollTop = textarea.scrollTop  // 保存当前滚动位置
   const content = blog.value.content
+  
   blog.value.content = content.substring(0, start) + template + content.substring(end)
-  // 插入后将光标移动到合适位置
-  setTimeout(() => {
+  
+  // 在下一个事件循环中设置光标位置和滚动位置
+  nextTick(() => {
     textarea.focus()
     textarea.setSelectionRange(start + template.length, start + template.length)
-  }, 0)
+    textarea.scrollTop = scrollTop  // 恢复滚动位置
+  })
 }
 
 // 修改插入Markdown的函数
