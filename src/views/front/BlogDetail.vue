@@ -140,7 +140,7 @@ onMounted(() => {
   @apply flex justify-center;
 }
 .prose img {
-  @apply h-auto rounded-lg shadow-lg my-8;
+  @apply h-auto rounded-lg shadow-lg my-2;
 }
 .prose h1 {
   @apply text-2xl font-bold mb-4;
@@ -153,7 +153,7 @@ onMounted(() => {
 .prose p {
   @apply mb-4 text-base;
   font-size: 1.1em;
-  line-height: 1.2;
+  line-height: 1.6;
   color: #1a1a1a;
 }
 .prose pre {
